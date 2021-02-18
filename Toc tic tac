@@ -1,0 +1,147 @@
+x=3
+o=5
+e=2
+t="TIE"
+n=9
+def instruction():  
+    print("Board position instructions: \n")
+    print("\t1 | 2 | 3")
+    print("\t-- --- --")
+    print("\t4 | 5 | 6")
+    print("\t-- --- --")
+    print("\t7 | 8 | 9")
+
+def validateyn(question): 
+    response=None 
+    while response not in ("y", "n"): 
+        response=input(question).lower() 
+    return response
+
+def validatenum(question,low,high): 
+    response=None 
+    while response not in range(low, high+1): 
+        response=int(input(question)) 
+    return response
+
+def player():
+    first=validateyn("\nDo you choose to play first? Enter (y/n): ")
+    if first=="y":
+        h=x
+        c=o
+    else:
+        c=x
+        h=o
+    print("\n")
+    return c,h
+
+def new_board():
+    board=[]
+    for s in range(n):
+        board.append(e)
+    return board
+
+def display_board(board):
+    print("\t", board[0], "|", board[1], "|", board[2])
+    print("\t", "-- --- --")
+    print("\t", board[3], "|", board[4], "|", board[5])
+    print("\t", "-- --- --")
+    print("\t", board[6], "|", board[7], "|", board[8], "\n")
+
+def go(board):
+    moves=[]
+    for s in range(n):
+        if board[s]==e:
+            moves.append(s)
+    return moves
+
+def posswin(board):
+    win=((0, 1, 2),
+         (3, 4, 5),
+         (6, 7, 8),
+         (0, 3, 6),
+         (1, 4, 7),
+         (2, 5, 8),
+         (0, 4, 8),
+         (2, 4, 6))
+    for row in win:
+        if board[row[0]]==board[row[1]]==board[row[2]]!=e:
+            w=board[row[0]]
+            return w
+    if e not in board:
+        return t
+    return None
+
+def human(board,h):
+    v=go(board)
+    move=None
+    while move not in v:
+        move=validatenum("Enter position (1 - 9):",0,n)
+        move-=1
+        if move not in v:
+            print("\nInvalid!Position is already occupied.")
+            print("\nChoose another square ")
+    print("\nYour Move:",move+1)
+    print("\n")
+    return move
+
+
+def computer(board,c,h):
+    board=board[:]
+    make2=(4, 1, 3, 5, 7, 0, 2, 6, 8)
+    for move in go(board):
+        board[move]=c
+        if posswin(board)==c:
+            print("\nComputer Move:",move+1)
+            print("\n")
+            return move
+        board[move]=e
+    for move in go(board):
+        board[move]=h
+        if posswin(board)==h:
+            print("\nComputer Move:",move+1)
+            print("\n")
+            return move
+        board[move]=e
+    for move in make2:
+        if move in go(board):
+            print("\nComputer Move:",move+1)
+            print("\n")
+            return move
+
+def next_turn(turn):
+    if turn==x:
+        return o
+    else:
+        return x
+
+def winner(w,c,h):
+    if w!=t:
+        print("Congratulations!! ")
+    else:
+        print(" ")
+    if w==c:
+        print("Computer Won!")
+    elif w==h:
+        print("Human Won!")
+    elif w==t:
+        print("It's a Draw!")
+
+def main():
+    instruction()
+    c,h=player()
+    turn=x
+    board=new_board()
+    display_board(board)
+    while not posswin(board):
+        if turn==h:
+            move=human(board,h)
+            board[move]=h
+        else:
+            move=computer(board,c,h)
+            board[move]=c
+        display_board(board)
+        turn=next_turn(turn)
+    win=posswin(board)
+    winner(win,c,h)
+
+main()
